@@ -82,6 +82,7 @@ def generate_2026_timestamps(count):
 
     '2026' days get the bulk of commits (brightest green).
     All other days get 1 commit each (lowest green, not blank).
+    Returns a sorted list of ISO date strings (not datetime objects).
     """
     bright = build_2026_pattern()
 
@@ -91,39 +92,25 @@ def generate_2026_timestamps(count):
 
     # Background days get exactly 1 commit each (lowest green)
     bg_total = len(bg_days)
-    # Remaining commits go to bright days
-    bright_total = count - bg_total
-    if bright_total < 0:
-        bright_total = 0
-        bg_total = count
+    bright_total = max(0, count - bg_total)
 
     bright_list = sorted(bright)
     per_bright = bright_total // len(bright_list) if bright_list else 0
     bright_remainder = bright_total % len(bright_list) if bright_list else 0
 
-    timestamps = []
-
-    # 1 commit per background day
+    # Build flat list of (day, n_commits) pairs
+    day_counts = []
     for day in bg_days:
-        ts = datetime.combine(day, datetime.min.time())
-        ts = ts.replace(
-            hour=random.randint(8, 23),
-            minute=random.randint(0, 59),
-            second=random.randint(0, 59),
-        )
-        timestamps.append(ts)
-
-    # Bulk commits on bright days
+        day_counts.append((day, 1))
     for i, day in enumerate(bright_list):
-        n = per_bright + (1 if i < bright_remainder else 0)
+        day_counts.append((day, per_bright + (1 if i < bright_remainder else 0)))
+
+    # Generate all timestamp strings in batch using pre-computed random values
+    timestamps = []
+    for day, n in day_counts:
+        base = f"{day.year}-{day.month:02d}-{day.day:02d}T"
         for _ in range(n):
-            ts = datetime.combine(day, datetime.min.time())
-            ts = ts.replace(
-                hour=random.randint(8, 23),
-                minute=random.randint(0, 59),
-                second=random.randint(0, 59),
-            )
-            timestamps.append(ts)
+            timestamps.append(f"{base}{random.randint(8,23):02d}:{random.randint(0,59):02d}:{random.randint(0,59):02d}")
 
     timestamps.sort()
     return timestamps
@@ -195,10 +182,8 @@ def run_session():
     # ── All commits are empty (same tree as parent, no file I/O) ──
     for i in range(num_commits):
         count = current + i + 1
-        ts = timestamps[i]
-        date_str = ts.strftime("%Y-%m-%dT%H:%M:%S")
-        env["GIT_AUTHOR_DATE"] = date_str
-        env["GIT_COMMITTER_DATE"] = date_str
+        env["GIT_AUTHOR_DATE"] = timestamps[i]
+        env["GIT_COMMITTER_DATE"] = timestamps[i]
 
         try:
             parent = commit_tree(tree, parent, f"falcon: {count:,}/{target:,}", env)

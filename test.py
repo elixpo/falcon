@@ -70,7 +70,9 @@ def simulate(total_commits=None, sessions=None):
     y_start = datetime(2026, 1, 1).date()
     y_end = datetime(2026, 12, 31).date()
     weeks = 53
-    bright = build_2026_pattern()
+    bright_dates = build_2026_pattern()
+    # Convert to strings to match day_counts keys
+    bright = set(d.isoformat() for d in bright_dates)
     day_labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
     # Header
@@ -89,7 +91,8 @@ def simulate(total_commits=None, sessions=None):
     sys.stdout.flush()
     for s in range(sessions):
         for t in generate_2026_timestamps(per_session):
-            day_counts[t.date()] += 1
+            # timestamps are now ISO strings "YYYY-MM-DDThh:mm:ss"
+            day_counts[t[:10]] += 1
         sys.stdout.write("█")
         sys.stdout.flush()
     print(f"  ({sessions} sessions)")
@@ -137,7 +140,7 @@ def simulate(total_commits=None, sessions=None):
             if date < y_start or date > y_end:
                 line += f"{OUTSIDE}{BLK}{R}"
             else:
-                c = day_counts.get(date, 0)
+                c = day_counts.get(date.isoformat(), 0)
                 line += f"{COLORS[intensity(c, q)]}{BLK}{R}"
         print(line)
 
@@ -161,9 +164,9 @@ def simulate(total_commits=None, sessions=None):
             if date < y_start or date > y_end:
                 line += f"{OUTSIDE}{BLK}{R}"
             else:
-                c = day_counts.get(date, 0)
+                c = day_counts.get(date.isoformat(), 0)
                 line += f"{COLORS[intensity(c, q)]}{BLK}{R}"
-            if date in bright:
+            if date.isoformat() in bright:
                 pat += "██"
             else:
                 pat += "░░"
