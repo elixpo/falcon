@@ -1,0 +1,35 @@
+name: Update Repo Description
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # Every 2 hours
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  update-description:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate count
+
+      - name: Count commits and update description
+        env:
+          GH_TOKEN: ${{ secrets.REPO_DESC_TOKEN }}
+        run: |
+          COUNT=$(git rev-list --count HEAD)
+          FORMATTED=$(printf "%'d" $COUNT)
+          DESC="An automated counting CI repository for automated GitHub commits! -- Right Now at ${FORMATTED} commits"
+
+          echo "Updating description: $DESC"
+
+          gh api repos/elixpo/falcon \
+            --method PATCH \
+            -f description="$DESC" \
+            --silent
+
+          echo "✓ Repository description updated to: $DESC"
