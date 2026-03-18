@@ -1,0 +1,10 @@
+[Unit]
+Description=Falcon Daily Commit Timer
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=14h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -11,6 +11,7 @@ from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.json")
 PROGRESS_FILE = os.path.join(SCRIPT_DIR, "progress.txt")
+STATE_FILE = os.path.join(SCRIPT_DIR, "state.json")
 
 DIGITS = {
     "0": [
@@ -109,6 +110,25 @@ def load_config():
         return json.load(f)
 
 
+def load_state():
+    """Load persistent state (survives restarts)."""
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "r") as f:
+            return json.load(f)
+    return {
+        "total_sessions": 0,
+        "total_commits_made": 0,
+        "last_session_date": None,
+        "pending_session": None,
+    }
+
+
+def save_state(state):
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+    # state.json is gitignored, purely local tracking
+
+
 def get_current_count():
     """Count total commits in the repo."""
     result = subprocess.run(
@@ -119,12 +139,10 @@ def get_current_count():
 
 
 def format_number(n):
-    """Format number with commas: 1234567 -> 1,234,567"""
     return f"{n:,}"
 
 
 def render_ascii_number(n):
-    """Render a number as big ASCII art."""
     formatted = format_number(n)
     lines = [""] * 6
     for ch in formatted:
@@ -135,7 +153,6 @@ def render_ascii_number(n):
 
 
 def make_progress_bar(current, target, width=40):
-    """Create a progress bar."""
     pct = min(current / target, 1.0)
     filled = int(width * pct)
     empty = width - filled
@@ -144,7 +161,6 @@ def make_progress_bar(current, target, width=40):
 
 
 def generate_progress_content(count, target, session_commits):
-    """Generate the full progress.txt content."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ascii_num = render_ascii_number(count)
 
@@ -201,7 +217,6 @@ def make_commit(count, target, session, co_authors):
 
 
 def push():
-    """Push to remote."""
     subprocess.run(
         ["git", "push", "origin", "main"],
         cwd=SCRIPT_DIR, capture_output=True, check=True
@@ -209,12 +224,12 @@ def push():
 
 
 def run_session():
-    """Run a single commit session."""
     config = load_config()
     target = config["target_commits"]
     co_authors = config["co_authors"]
     min_c = config["min_commits_per_day"]
     max_c = config["max_commits_per_day"]
+    state = load_state()
 
     current = get_current_count()
 
@@ -222,32 +237,73 @@ def run_session():
         print(f"[falcon] Target reached! {format_number(current)}/{format_number(target)}")
         return
 
-    # Determine how many commits this session
-    num_commits = random.randint(min_c, max_c)
-    remaining = target - current
-    num_commits = min(num_commits, remaining)
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # Check if we have an interrupted session to resume
+    pending = state.get("pending_session")
+    if pending and pending["date"] == today:
+        num_commits = pending["remaining"]
+        print(f"[falcon] Resuming interrupted session: {format_number(num_commits)} commits left")
+    else:
+        num_commits = random.randint(min_c, max_c)
+        remaining = target - current
+        num_commits = min(num_commits, remaining)
+
+    # Save pending session state before starting
+    state["pending_session"] = {
+        "date": today,
+        "planned": num_commits,
+        "remaining": num_commits,
+    }
+    save_state(state)
 
     print(f"[falcon] Starting session: {format_number(num_commits)} commits")
     print(f"[falcon] Current: {format_number(current)} | Target: {format_number(target)}")
 
+    completed = 0
     for i in range(num_commits):
         try:
             make_commit(current + i, target, i, co_authors)
+            completed += 1
+
             if (i + 1) % 100 == 0:
                 print(f"[falcon] ... {i + 1}/{num_commits} commits done")
+
+            # Push every 50 commits
+            if (i + 1) % 50 == 0 and config.get("auto_push", True):
+                try:
+                    push()
+                    print(f"[falcon] Pushed batch at commit {i + 1}")
+                except subprocess.CalledProcessError as e:
+                    print(f"[falcon] Batch push failed: {e}", file=sys.stderr)
+
+            # Update remaining count in state every 10 commits
+            if (i + 1) % 10 == 0:
+                state["pending_session"]["remaining"] = num_commits - completed
+                save_state(state)
+
         except subprocess.CalledProcessError as e:
             print(f"[falcon] Commit failed at {i + 1}: {e}", file=sys.stderr)
+            state["pending_session"]["remaining"] = num_commits - completed
+            save_state(state)
             break
 
-    # Push after all commits
-    if config.get("auto_push", True):
+    # Final push for any remaining commits not covered by the batch push
+    if config.get("auto_push", True) and completed % 50 != 0:
         try:
             push()
-            print(f"[falcon] Pushed {format_number(num_commits)} commits to origin/main")
+            print(f"[falcon] Final push complete ({format_number(completed)} commits)")
         except subprocess.CalledProcessError as e:
             print(f"[falcon] Push failed: {e}", file=sys.stderr)
 
+    # Update state — session complete
     final_count = get_current_count()
+    state["total_sessions"] += 1
+    state["total_commits_made"] += completed
+    state["last_session_date"] = today
+    state["pending_session"] = None
+    save_state(state)
+
     print(f"[falcon] Session complete. Total: {format_number(final_count)}")
 
 
