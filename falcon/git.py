@@ -1,8 +1,11 @@
+import os
 import random
 import subprocess
 
 from .config import ROOT_DIR, PROGRESS_FILE
-from .renderer import generate_progress_content
+from .renderer import generate_progress_content, generate_readme
+
+README_FILE = os.path.join(ROOT_DIR, "README.md")
 
 
 def get_current_count():
@@ -19,11 +22,17 @@ def pick_co_author(co_authors):
 
 
 def make_commit(count, target, session, co_authors):
+    # Update progress.txt
     content = generate_progress_content(count + 1, target, session + 1)
     with open(PROGRESS_FILE, "w") as f:
         f.write(content)
 
-    subprocess.run(["git", "add", "progress.txt"], cwd=ROOT_DIR, check=True)
+    # Update README.md
+    readme = generate_readme(count + 1, target, co_authors)
+    with open(README_FILE, "w") as f:
+        f.write(readme)
+
+    subprocess.run(["git", "add", "progress.txt", "README.md"], cwd=ROOT_DIR, check=True)
 
     co_author_line = pick_co_author(co_authors)
     commit_msg = f"falcon: progress {count + 1:,}/{target:,}\n\n{co_author_line}"
