@@ -7,11 +7,9 @@ from datetime import datetime, timedelta
 
 from .config import load_config, load_state, save_state, ROOT_DIR, PROGRESS_FILE
 from .git import (
-    get_current_count, get_head_commit, write_tree, stage_files,
+    get_current_count, get_head_commit, write_tree,
     commit_tree, update_ref, push, setup_git_optimizations, gc_cleanup,
-    README_FILE,
 )
-from .renderer import generate_readme
 
 
 # 5×7 pixel font for contribution graph (row=day_of_week, col=week)
@@ -207,27 +205,17 @@ def run_session():
             state["pending_session"]["remaining"] = num_commits - completed
             save_state(state)
 
-    # ── Final commit: the only one that updates files ──
+    # ── Finalize: update ref and push ──
     final_count = current + completed
     update_ref(branch, parent)
 
-    readme = generate_readme(final_count, target)
-    with open(README_FILE, "w") as f:
-        f.write(readme)
+    # Save progress counter locally (README is updated by CI)
     with open(PROGRESS_FILE, "w") as f:
         f.write(str(final_count))
-    stage_files("README.md", "progress.txt")
-
-    now = datetime.now()
-    env["GIT_AUTHOR_DATE"] = now.strftime("%Y-%m-%dT%H:%M:%S")
-    env["GIT_COMMITTER_DATE"] = env["GIT_AUTHOR_DATE"]
-    final_tree = write_tree()
-    final_commit = commit_tree(final_tree, parent, f"falcon: {final_count:,}/{target:,}", env)
-    update_ref(branch, final_commit)
 
     # ── Single push for the entire session ──
     if config.get("auto_push", True):
-        print(f"[falcon] Pushing {completed + 1:,} commits...")
+        print(f"[falcon] Pushing {completed:,} commits...")
         try:
             push(branch)
             print(f"[falcon] Push complete")

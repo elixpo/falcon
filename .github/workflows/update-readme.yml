@@ -1,0 +1,41 @@
+name: Update README
+
+on:
+  schedule:
+    - cron: '30 */2 * * *'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate README
+        run: python3 scripts/update_readme.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "Circuit-Overtime"
+          git config user.email "ayushbhatt633@gmail.com"
+          git add README.md
+
+          if git diff --cached --quiet; then
+            echo "README unchanged, skipping"
+            exit 0
+          fi
+
+          COUNT=$(git rev-list --count HEAD)
+          FORMATTED=$(printf "%'d" $COUNT)
+          git commit -m "falcon: update README — ${FORMATTED} commits"
+          git push
