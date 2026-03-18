@@ -4,7 +4,6 @@
   "repo_path": "/home/elixpo_workstation/falcon",
   "branch": "main",
   "auto_push": true,
-  "push_interval": 5000,
   "readme_update_interval": 5000,
   "committer": {
     "name": "elixpoo",

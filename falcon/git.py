@@ -79,7 +79,7 @@ def update_ref(branch, commit_hash):
 def push(branch="main"):
     subprocess.run(
         ["git", "push", "origin", branch],
-        cwd=ROOT_DIR, capture_output=True, check=True, timeout=120
+        cwd=ROOT_DIR, capture_output=True, check=True, timeout=600
     )
 
 

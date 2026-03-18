@@ -1,7 +1,7 @@
 services:
   falcon:
     build: .
-    container_name: falcon-engine
+    container_name: github-falcon
     restart: unless-stopped
     environment:
       - GIT_USER_NAME=elixpoo

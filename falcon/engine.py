@@ -134,7 +134,6 @@ def run_session():
     target = config["target_commits"]
     committer = config["committer"]
     daily_target = config.get("daily_target", 200000)
-    push_interval = config.get("push_interval", 5000)
     readme_interval = config.get("readme_update_interval", 5000)
     branch = config.get("branch", "main")
 
@@ -231,16 +230,11 @@ def run_session():
             save_state(state)
             break
 
-        # Push periodically
-        if completed % push_interval == 0 and config.get("auto_push", True):
-            update_ref(branch, parent)
-            try:
-                push(branch)
-                elapsed = time.time() - start_time
-                rate = completed / elapsed if elapsed > 0 else 0
-                print(f"[falcon] Pushed {completed:,}/{num_commits:,} | {rate:.0f} commits/sec")
-            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-                print(f"[falcon] Push failed at {completed:,}: {e}", file=sys.stderr)
+        # Progress log every 10k commits
+        if completed % 10000 == 0:
+            elapsed = time.time() - start_time
+            rate = completed / elapsed if elapsed > 0 else 0
+            print(f"[falcon] Progress {completed:,}/{num_commits:,} | {rate:.0f} commits/sec")
 
         # Checkpoint state every 50k commits
         if completed % 50000 == 0:
