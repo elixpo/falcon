@@ -15,6 +15,7 @@
 
 [![Commits](https://img.shields.io/github/commit-activity/w/elixpo/falcon?style=for-the-badge&color=00d4ff&label=Weekly%20Commits)](https://github.com/elixpo/falcon/commits/main)
 [![Total Commits](https://img.shields.io/github/last-commit/elixpo/falcon?style=for-the-badge&color=7c3aed&label=Last%20Commit)](https://github.com/elixpo/falcon)
+[![CI](https://img.shields.io/github/actions/workflow/status/elixpo/falcon/falcon-ci.yml?style=for-the-badge&color=22c55e&label=CI)](https://github.com/elixpo/falcon/actions)
 [![Stars](https://img.shields.io/github/stars/elixpo/falcon?style=for-the-badge&color=fbbf24)](https://github.com/elixpo/falcon)
 
 </div>
@@ -56,11 +57,24 @@ Multiple contributors are credited across commits to reflect the collaborative n
 
 ```
 falcon/
-├── falcon.py          # Core commit engine
-├── setup_cron.py      # Cron scheduler (random daily times)
-├── config.json        # Settings: commit range, co-authors, target
-├── progress.txt       # Live progress tracker (auto-updated)
-├── falcon.log         # Session logs
+├── falcon/                  # Core Python package
+│   ├── __init__.py
+│   ├── __main__.py          # Entry point (python -m falcon)
+│   ├── ascii_art.py         # ASCII digit font + renderer
+│   ├── config.py            # Config & state management
+│   ├── engine.py            # Session orchestrator
+│   ├── git.py               # Git operations (commit, push)
+│   └── renderer.py          # Progress bar + content generation
+├── scripts/
+│   ├── setup_cron.py        # Cron scheduler
+│   └── setup_systemd.sh     # Systemd installer
+├── systemd/                 # Systemd unit files
+│   ├── falcon.service
+│   └── falcon.timer
+├── .github/workflows/       # CI pipeline
+│   └── falcon-ci.yml
+├── config.json              # Settings: commit range, co-authors, target
+├── progress.txt             # Live progress tracker (auto-updated)
 └── README.md
 ```
 
@@ -71,14 +85,15 @@ falcon/
 git clone https://github.com/elixpo/falcon.git
 cd falcon
 
-# Set up cron jobs (7 random times across the week)
-python3 setup_cron.py
-
-# Or do a dry run first
-python3 setup_cron.py --dry-run
-
 # Run manually
-python3 falcon.py
+python3 -m falcon
+
+# Set up cron jobs (7 random times across the week)
+python3 scripts/setup_cron.py --dry-run
+python3 scripts/setup_cron.py
+
+# Or use systemd (recommended for always-on machines)
+sudo ./scripts/setup_systemd.sh
 ```
 
 ## Configuration

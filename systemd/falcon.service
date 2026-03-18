@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=oneshot
 User=elixpo_workstation
 WorkingDirectory=/home/elixpo_workstation/falcon
-ExecStart=/home/elixpo_workstation/falcon/venv/bin/python3 /home/elixpo_workstation/falcon/falcon.py
+ExecStart=/home/elixpo_workstation/falcon/venv/bin/python3 -m falcon
 StandardOutput=append:/home/elixpo_workstation/falcon/falcon.log
 StandardError=append:/home/elixpo_workstation/falcon/falcon.log
 Environment=HOME=/home/elixpo_workstation

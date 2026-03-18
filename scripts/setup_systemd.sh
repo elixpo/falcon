@@ -2,23 +2,21 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SERVICE_DIR="$SCRIPT_DIR/systemd"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+SERVICE_DIR="$ROOT_DIR/systemd"
 
 echo "╔══════════════════════════════════════════╗"
 echo "║     FALCON SYSTEMD INSTALLER             ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 
-# Copy unit files
 echo "[1/4] Copying unit files to /etc/systemd/system/ ..."
 sudo cp "$SERVICE_DIR/falcon.service" /etc/systemd/system/falcon.service
 sudo cp "$SERVICE_DIR/falcon.timer" /etc/systemd/system/falcon.timer
 
-# Reload systemd
 echo "[2/4] Reloading systemd daemon ..."
 sudo systemctl daemon-reload
 
-# Enable and start the timer
 echo "[3/4] Enabling falcon.timer ..."
 sudo systemctl enable falcon.timer
 

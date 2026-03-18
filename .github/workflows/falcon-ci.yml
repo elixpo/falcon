@@ -1,0 +1,75 @@
+name: Falcon CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "falcon/**"
+      - "config.json"
+      - ".github/workflows/falcon-ci.yml"
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install flake8
+
+      - name: Run flake8
+        run: flake8 falcon/ --max-line-length=120 --ignore=E501,W503
+
+  validate-config:
+    name: Validate Config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate config.json
+        run: python -c "import json; c=json.load(open('config.json')); assert 'co_authors' in c; assert 'target_commits' in c; print('✓ config.json is valid')"
+
+      - name: Validate module imports
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -c "
+          from falcon.ascii_art import DIGITS, BANNER, render_ascii_number
+          from falcon.config import load_config
+          from falcon.renderer import generate_progress_content, make_progress_bar
+          print('✓ All modules import successfully')
+          "
+
+  progress-check:
+    name: Progress Report
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Commit count
+        run: |
+          COUNT=$(git rev-list --count HEAD)
+          TARGET=200000
+          PCT=$(echo "scale=2; $COUNT * 100 / $TARGET" | bc)
+          echo "### Falcon Progress" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commits** | $COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target** | $TARGET |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Progress** | ${PCT}% |" >> $GITHUB_STEP_SUMMARY
