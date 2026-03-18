@@ -134,7 +134,6 @@ def run_session():
     target = config["target_commits"]
     committer = config["committer"]
     daily_target = config.get("daily_target", 200000)
-    readme_interval = config.get("readme_update_interval", 5000)
     branch = config.get("branch", "main")
 
     # Apply git performance optimizations
@@ -186,21 +185,14 @@ def run_session():
     env["GIT_COMMITTER_NAME"] = committer["name"]
     env["GIT_COMMITTER_EMAIL"] = committer["email"]
 
-    # Get initial state
+    # Get current HEAD tree and commit — all empty commits reuse this tree
     parent = get_head_commit()
-
-    # Write initial README and get tree
-    readme = generate_readme(current, target)
-    with open(README_FILE, "w") as f:
-        f.write(readme)
-    with open(PROGRESS_FILE, "w") as f:
-        f.write(str(current))
-    stage_files("README.md", "progress.txt")
     tree = write_tree()
 
     start_time = time.time()
     completed = 0
 
+    # ── All commits are empty (same tree as parent, no file I/O) ──
     for i in range(num_commits):
         count = current + i + 1
         ts = timestamps[i]
@@ -208,18 +200,6 @@ def run_session():
         env["GIT_AUTHOR_DATE"] = date_str
         env["GIT_COMMITTER_DATE"] = date_str
 
-        # Update files and tree periodically
-        if i > 0 and i % readme_interval == 0:
-            update_ref(branch, parent)
-            readme = generate_readme(count, target)
-            with open(README_FILE, "w") as f:
-                f.write(readme)
-            with open(PROGRESS_FILE, "w") as f:
-                f.write(str(count))
-            stage_files("README.md", "progress.txt")
-            tree = write_tree()
-
-        # Create commit using plumbing (no hooks, no index scan)
         try:
             parent = commit_tree(tree, parent, f"falcon: {count:,}/{target:,}", env)
             completed += 1
@@ -236,12 +216,13 @@ def run_session():
             rate = completed / elapsed if elapsed > 0 else 0
             print(f"[falcon] Progress {completed:,}/{num_commits:,} | {rate:.0f} commits/sec")
 
-        # Checkpoint state every 50k commits
+        # Checkpoint state every 50k commits (crash recovery)
         if completed % 50000 == 0:
+            update_ref(branch, parent)
             state["pending_session"]["remaining"] = num_commits - completed
             save_state(state)
 
-    # Final: update files, ref, and push
+    # ── Final commit: the only one that updates files ──
     final_count = current + completed
     update_ref(branch, parent)
 
@@ -252,19 +233,22 @@ def run_session():
         f.write(str(final_count))
     stage_files("README.md", "progress.txt")
 
-    # Final commit with current timestamp
     now = datetime.now()
     env["GIT_AUTHOR_DATE"] = now.strftime("%Y-%m-%dT%H:%M:%S")
     env["GIT_COMMITTER_DATE"] = env["GIT_AUTHOR_DATE"]
-    tree = write_tree()
-    final_commit = commit_tree(tree, parent, f"falcon: {final_count:,}/{target:,}", env)
+    final_tree = write_tree()
+    final_commit = commit_tree(final_tree, parent, f"falcon: {final_count:,}/{target:,}", env)
     update_ref(branch, final_commit)
 
+    # ── Single push for the entire session ──
     if config.get("auto_push", True):
+        print(f"[falcon] Pushing {completed + 1:,} commits...")
         try:
             push(branch)
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-            print("[falcon] Final push failed", file=sys.stderr)
+            print(f"[falcon] Push complete")
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"[falcon] Push failed: {e}", file=sys.stderr)
+            print(f"[falcon] Commits are saved locally — retry with: git push origin {branch}")
 
     elapsed = time.time() - start_time
     rate = completed / elapsed if elapsed > 0 else 0
