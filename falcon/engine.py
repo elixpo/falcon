@@ -88,8 +88,10 @@ def generate_2026_timestamps(count):
     start = datetime(2026, 1, 1).date()
     all_days = [start + timedelta(days=i) for i in range(365)]
 
-    # Weight: bright=8, background=1
-    BRIGHT_WEIGHT = 8
+    # Weight: bright=50, background=1
+    # High ratio ensures bg days land in Q1 (dark green) and
+    # bright days land in Q4 (neon green) for maximum contrast
+    BRIGHT_WEIGHT = 50
     BG_WEIGHT = 1
     weights = []
     for day in all_days:

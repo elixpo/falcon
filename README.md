@@ -22,61 +22,9 @@
 
 <div align="center">
 
-## :rocket: Live Progress
 
-<br>
-
-### `0` / `200,000`
-
-`░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░` **0.00%**
-
-<br>
-
-| | Metric | Value | |
-|:---:|:------:|:-----:|:---:|
-| :chart_with_upwards_trend: | **Current** | **0** | :zap: |
-| :dart: | **Target** | **200,000** | :checkered_flag: |
-| :hourglass: | **Remaining** | **200,000** | :clock1: |
-| :bar_chart: | **Completion** | **0.00%** | :fire: |
-| :calendar: | **Daily Rate** | **~900 - 1,000** | :repeat: |
-| :stopwatch: | **ETA** | **~211 days** | :rocket: |
-| :arrows_counterclockwise: | **Last Updated** | **2026-03-18 18:09:33** | :satellite: |
-
-</div>
-
----
-
-<div align="center">
-
-## :world_map: Activity Heatmap
-
-```
-  ░░░░░░░ ░░░░░░░ ░░░░░░░ ░░░░░░░
-  W1      W2      W3      W4
-```
 
 <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Circuit-Overtime&theme=github_dark" width="95%"/>
-
-</div>
-
----
-
-<div align="center">
-
-## :trophy: Milestones
-
-| Checkpoint | Status |
-|:----------:|:------:|
-| **1,000** | :hourglass_flowing_sand: Pending |
-| **5,000** | :hourglass_flowing_sand: Pending |
-| **10,000** | :hourglass_flowing_sand: Pending |
-| **25,000** | :hourglass_flowing_sand: Pending |
-| **50,000** | :hourglass_flowing_sand: Pending |
-| **75,000** | :hourglass_flowing_sand: Pending |
-| **100,000** | :hourglass_flowing_sand: Pending |
-| **150,000** | :hourglass_flowing_sand: Pending |
-| **200,000** | :hourglass_flowing_sand: Pending |
-
 
 </div>
 
