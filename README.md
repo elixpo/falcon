@@ -14,17 +14,15 @@
 
 <br>
 
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=Circuit-Overtime&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
+<img src="https://github-readme-activity-graph.vercel.app/graph?username=elixpo&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
 
 </div>
 
 ---
+## Activity Summary
 
 <div align="center">
-
-
-
-<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Circuit-Overtime&theme=github_dark" width="95%"/>
+<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=elixpoo&theme=github_dark" width="95%"/>
 
 </div>
 

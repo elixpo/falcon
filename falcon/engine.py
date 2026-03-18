@@ -80,55 +80,19 @@ def build_2026_pattern():
 def generate_2026_timestamps(count):
     """Generate timestamps that paint '2026' on the contribution graph.
 
-    Bright dates (forming '2026') get 8x more commits than background.
-    All days get some commits so every square is filled.
+    ONLY the 58 days forming '2026' get commits.
+    All other days stay at zero (gray squares) for maximum contrast.
     """
     bright = build_2026_pattern()
+    bright_list = sorted(bright)
 
-    start = datetime(2026, 1, 1).date()
-    all_days = [start + timedelta(days=i) for i in range(365)]
+    # Distribute all commits evenly across the 58 bright days
+    per_day = count // len(bright_list)
+    remainder = count % len(bright_list)
 
-    # Weight: bright=50, background=1
-    # High ratio ensures bg days land in Q1 (dark green) and
-    # bright days land in Q4 (neon green) for maximum contrast
-    BRIGHT_WEIGHT = 50
-    BG_WEIGHT = 1
-    weights = []
-    for day in all_days:
-        weights.append(BRIGHT_WEIGHT if day in bright else BG_WEIGHT)
-
-    total_weight = sum(weights)
-
-    # Distribute commits proportionally
-    # Only enforce min 1/day (fill all squares) when count >= 365
-    min_per_day = 1 if count >= 365 else 0
-    day_commits = {}
-    assigned = 0
-    for day, w in zip(all_days, weights):
-        n = max(min_per_day, int(count * w / total_weight))
-        day_commits[day] = n
-        assigned += n
-
-    # Fix remainder — distribute across all days until exact
-    diff = count - assigned
-    while diff > 0:
-        pool = list(bright) if diff > len(all_days) else all_days
-        batch = min(diff, len(pool))
-        for day in random.sample(pool, batch):
-            day_commits[day] += 1
-        diff -= batch
-    while diff < 0:
-        bg_days = [d for d in all_days if d not in bright and day_commits[d] > 1]
-        if not bg_days:
-            break
-        batch = min(-diff, len(bg_days))
-        for day in random.sample(bg_days, batch):
-            day_commits[day] -= 1
-        diff += batch
-
-    # Generate actual timestamps
     timestamps = []
-    for day, n in day_commits.items():
+    for i, day in enumerate(bright_list):
+        n = per_day + (1 if i < remainder else 0)
         for _ in range(n):
             ts = datetime.combine(day, datetime.min.time())
             ts = ts.replace(
