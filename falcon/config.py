@@ -1,7 +1,7 @@
 import json
 import os
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT_DIR = os.environ.get("FALCON_REPO_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CONFIG_PATH = os.path.join(ROOT_DIR, "config.json")
 PROGRESS_FILE = os.path.join(ROOT_DIR, "progress.txt")
 STATE_FILE = os.path.join(ROOT_DIR, "state.json")

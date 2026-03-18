@@ -36,6 +36,7 @@ else
     cd /repo
 fi
 
+export FALCON_REPO_DIR=/repo
 echo "[falcon] Current commit count: $(git rev-list --count HEAD)"
 
 # Run mode

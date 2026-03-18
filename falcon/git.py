@@ -76,11 +76,23 @@ def update_ref(branch, commit_hash):
     )
 
 
-def push(branch="main"):
-    subprocess.run(
-        ["git", "push", "origin", branch],
-        cwd=ROOT_DIR, capture_output=True, check=True, timeout=600
-    )
+def push(branch="main", retries=3):
+    """Push to remote with retries. Timeout 10 min per attempt."""
+    for attempt in range(1, retries + 1):
+        try:
+            subprocess.run(
+                ["git", "push", "origin", branch],
+                cwd=ROOT_DIR, capture_output=True, check=True, timeout=600
+            )
+            return
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            if attempt < retries:
+                import time
+                wait = attempt * 30
+                print(f"[falcon] Push attempt {attempt}/{retries} failed, retrying in {wait}s...")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def gc_cleanup():
