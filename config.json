@@ -1,6 +1,6 @@
 {
   "min_commits_per_day": 900,
-  "max_commits_per_day": 1000,
+  "max_commits_per_day": 2000,
   "target_commits": 200000,
   "repo_path": "/home/elixpo_workstation/falcon",
   "branch": "main",

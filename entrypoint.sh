@@ -37,7 +37,7 @@ case "${MODE:-loop}" in
         python3 -m falcon
         ;;
     loop)
-        echo "[falcon] Starting loop mode (session every ${INTERVAL_HOURS:-24}h ± ${JITTER_HOURS:-6}h)"
+        echo "[falcon] Starting loop mode — one session per day at a random time"
         while true; do
             # Check if target reached
             COUNT=$(git rev-list --count HEAD)
@@ -50,13 +50,14 @@ case "${MODE:-loop}" in
             echo "[falcon] Starting session at $(date)"
             python3 -m falcon || echo "[falcon] Session failed, will retry next cycle"
 
-            # Sleep with jitter
-            BASE=$((${INTERVAL_HOURS:-24} * 3600))
-            JITTER=$((RANDOM % (${JITTER_HOURS:-6} * 3600)))
+            # Sleep 18-24h so we guarantee one session every calendar day
+            # 18h base + 0-6h jitter = 18-24h between sessions
+            BASE=$((18 * 3600))
+            JITTER=$((RANDOM % (6 * 3600)))
             SLEEP=$((BASE + JITTER))
             HOURS=$((SLEEP / 3600))
             MINS=$(( (SLEEP % 3600) / 60 ))
-            echo "[falcon] Next session in ${HOURS}h ${MINS}m"
+            echo "[falcon] Next session in ${HOURS}h ${MINS}m ($(date -d "+${SLEEP} seconds" 2>/dev/null || echo 'check logs'))"
             sleep $SLEEP
         done
         ;;

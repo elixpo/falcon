@@ -8,8 +8,6 @@ services:
       - GIT_USER_EMAIL=ayushbhatt633@gmail.com
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - MODE=loop
-      - INTERVAL_HOURS=24
-      - JITTER_HOURS=6
     volumes:
       - .:/repo
     logging:
