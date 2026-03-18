@@ -1,17 +1,13 @@
 {
-  "min_commits_per_day": 900,
-  "max_commits_per_day": 2000,
-  "target_commits": 200000,
+  "target_commits": 1000000,
+  "commits_per_session": 200000,
   "repo_path": "/home/elixpo_workstation/falcon",
   "branch": "main",
   "auto_push": true,
+  "push_interval": 5000,
+  "readme_update_interval": 5000,
   "committer": {
     "name": "elixpoo",
     "email": "elixpoo@gmail.com"
-  },
-  "co_authors": [
-    { "name": "Circuit-Overtime", "email": "ayushbhatt633@gmail.com", "weight": 5 },
-    { "name": "ez-vivek", "email": "vivektalent200@gmail.com", "weight": 3 },
-    { "name": "CSE-Anwesha", "email": "misschakraborty2004@gmail.com", "weight": 2 }
-  ]
+  }
 }
