@@ -1,11 +1,31 @@
 import os
-import random
 import subprocess
 
 from .config import ROOT_DIR, PROGRESS_FILE
-from .renderer import generate_progress_content, generate_readme
 
 README_FILE = os.path.join(ROOT_DIR, "README.md")
+
+
+def setup_git_optimizations():
+    """Apply all git performance tweaks for maximum commit speed."""
+    opts = {
+        "gc.auto": "0",
+        "core.preloadIndex": "true",
+        "core.fscache": "true",
+        "pack.threads": "0",
+        "commit.gpgsign": "false",
+        "core.hooksPath": "/dev/null",
+        "core.autocrlf": "false",
+        "core.fsmonitor": "false",
+        "core.untrackedCache": "false",
+        "receive.autogc": "false",
+        "gc.autoDetach": "false",
+    }
+    for key, val in opts.items():
+        subprocess.run(
+            ["git", "config", key, val],
+            cwd=ROOT_DIR, capture_output=True
+        )
 
 
 def get_current_count():
@@ -16,44 +36,56 @@ def get_current_count():
     return int(result.stdout.strip())
 
 
-def pick_co_author(co_authors):
-    weights = [a.get("weight", 1) for a in co_authors]
-    author = random.choices(co_authors, weights=weights, k=1)[0]
-    return f"Co-authored-by: {author['name']} <{author['email']}>"
+def get_head_commit():
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT_DIR, capture_output=True, text=True
+    )
+    return result.stdout.strip()
 
 
-def make_commit(count, target, session, co_authors, committer=None):
-    # Update progress.txt
-    content = generate_progress_content(count + 1, target, session + 1)
-    with open(PROGRESS_FILE, "w") as f:
-        f.write(content)
+def write_tree():
+    """Write current index to a tree object and return its hash."""
+    result = subprocess.run(
+        ["git", "write-tree"],
+        cwd=ROOT_DIR, capture_output=True, text=True, check=True
+    )
+    return result.stdout.strip()
 
-    # Update README.md
-    readme = generate_readme(count + 1, target, co_authors)
-    with open(README_FILE, "w") as f:
-        f.write(readme)
 
-    subprocess.run(["git", "add", "progress.txt", "README.md"], cwd=ROOT_DIR, check=True)
-
-    co_author_line = pick_co_author(co_authors)
-    commit_msg = f"falcon: progress {count + 1:,}/{target:,}\n\n{co_author_line}"
-
-    # Commit as lixiorg (committer), co-authors get attributed in trailer
-    env = os.environ.copy()
-    if committer:
-        env["GIT_AUTHOR_NAME"] = committer["name"]
-        env["GIT_AUTHOR_EMAIL"] = committer["email"]
-        env["GIT_COMMITTER_NAME"] = committer["name"]
-        env["GIT_COMMITTER_EMAIL"] = committer["email"]
-
+def stage_files(*files):
     subprocess.run(
-        ["git", "commit", "-m", commit_msg],
-        cwd=ROOT_DIR, capture_output=True, check=True, env=env
+        ["git", "add"] + list(files),
+        cwd=ROOT_DIR, capture_output=True, check=True
+    )
+
+
+def commit_tree(tree, parent, message, env):
+    """Create a commit object using git plumbing. Returns commit hash."""
+    result = subprocess.run(
+        ["git", "commit-tree", tree, "-p", parent, "-m", message],
+        cwd=ROOT_DIR, capture_output=True, text=True, check=True, env=env
+    )
+    return result.stdout.strip()
+
+
+def update_ref(branch, commit_hash):
+    subprocess.run(
+        ["git", "update-ref", f"refs/heads/{branch}", commit_hash],
+        cwd=ROOT_DIR, capture_output=True, check=True
     )
 
 
 def push(branch="main"):
     subprocess.run(
         ["git", "push", "origin", branch],
-        cwd=ROOT_DIR, capture_output=True, check=True
+        cwd=ROOT_DIR, capture_output=True, check=True, timeout=120
+    )
+
+
+def gc_cleanup():
+    """Run aggressive gc after session to compress objects."""
+    subprocess.run(
+        ["git", "gc", "--aggressive", "--prune=now"],
+        cwd=ROOT_DIR, capture_output=True, timeout=600
     )
