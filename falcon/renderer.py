@@ -19,7 +19,7 @@ def generate_readme(count, target):
 
 <br>
 
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=elixpo&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
+<img src="https://github-readme-activity-graph.vercel.app/graph?username=elixpoo&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
 
 <br>
 
