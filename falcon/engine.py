@@ -80,19 +80,42 @@ def build_2026_pattern():
 def generate_2026_timestamps(count):
     """Generate timestamps that paint '2026' on the contribution graph.
 
-    ONLY the 58 days forming '2026' get commits.
-    All other days stay at zero (gray squares) for maximum contrast.
+    '2026' days get the bulk of commits (brightest green).
+    All other days get 1 commit each (lowest green, not blank).
     """
     bright = build_2026_pattern()
-    bright_list = sorted(bright)
 
-    # Distribute all commits evenly across the 58 bright days
-    per_day = count // len(bright_list)
-    remainder = count % len(bright_list)
+    start = datetime(2026, 1, 1).date()
+    all_days = [start + timedelta(days=i) for i in range(365)]
+    bg_days = [d for d in all_days if d not in bright]
+
+    # Background days get exactly 1 commit each (lowest green)
+    bg_total = len(bg_days)
+    # Remaining commits go to bright days
+    bright_total = count - bg_total
+    if bright_total < 0:
+        bright_total = 0
+        bg_total = count
+
+    bright_list = sorted(bright)
+    per_bright = bright_total // len(bright_list) if bright_list else 0
+    bright_remainder = bright_total % len(bright_list) if bright_list else 0
 
     timestamps = []
+
+    # 1 commit per background day
+    for day in bg_days:
+        ts = datetime.combine(day, datetime.min.time())
+        ts = ts.replace(
+            hour=random.randint(8, 23),
+            minute=random.randint(0, 59),
+            second=random.randint(0, 59),
+        )
+        timestamps.append(ts)
+
+    # Bulk commits on bright days
     for i, day in enumerate(bright_list):
-        n = per_day + (1 if i < remainder else 0)
+        n = per_bright + (1 if i < bright_remainder else 0)
         for _ in range(n):
             ts = datetime.combine(day, datetime.min.time())
             ts = ts.replace(
