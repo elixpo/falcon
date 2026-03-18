@@ -17,11 +17,12 @@ def get_current_count():
 
 
 def pick_co_author(co_authors):
-    author = random.choice(co_authors)
+    weights = [a.get("weight", 1) for a in co_authors]
+    author = random.choices(co_authors, weights=weights, k=1)[0]
     return f"Co-authored-by: {author['name']} <{author['email']}>"
 
 
-def make_commit(count, target, session, co_authors):
+def make_commit(count, target, session, co_authors, committer=None):
     # Update progress.txt
     content = generate_progress_content(count + 1, target, session + 1)
     with open(PROGRESS_FILE, "w") as f:
@@ -37,9 +38,17 @@ def make_commit(count, target, session, co_authors):
     co_author_line = pick_co_author(co_authors)
     commit_msg = f"falcon: progress {count + 1:,}/{target:,}\n\n{co_author_line}"
 
+    # Commit as lixiorg (committer), co-authors get attributed in trailer
+    env = os.environ.copy()
+    if committer:
+        env["GIT_AUTHOR_NAME"] = committer["name"]
+        env["GIT_AUTHOR_EMAIL"] = committer["email"]
+        env["GIT_COMMITTER_NAME"] = committer["name"]
+        env["GIT_COMMITTER_EMAIL"] = committer["email"]
+
     subprocess.run(
         ["git", "commit", "-m", commit_msg],
-        cwd=ROOT_DIR, capture_output=True, check=True
+        cwd=ROOT_DIR, capture_output=True, check=True, env=env
     )
 
 

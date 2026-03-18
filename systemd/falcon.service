@@ -11,10 +11,10 @@ ExecStart=/home/elixpo_workstation/falcon/venv/bin/python3 -m falcon
 StandardOutput=append:/home/elixpo_workstation/falcon/falcon.log
 StandardError=append:/home/elixpo_workstation/falcon/falcon.log
 Environment=HOME=/home/elixpo_workstation
-Environment=GIT_AUTHOR_NAME=Circuit-Overtime
-Environment=GIT_AUTHOR_EMAIL=ayushbhatt633@gmail.com
-Environment=GIT_COMMITTER_NAME=Circuit-Overtime
-Environment=GIT_COMMITTER_EMAIL=ayushbhatt633@gmail.com
+Environment=GIT_AUTHOR_NAME=lixiorg
+Environment=GIT_AUTHOR_EMAIL=lixiorg@users.noreply.github.com
+Environment=GIT_COMMITTER_NAME=lixiorg
+Environment=GIT_COMMITTER_EMAIL=lixiorg@users.noreply.github.com
 
 [Install]
 WantedBy=multi-user.target

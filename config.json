@@ -5,8 +5,13 @@
   "repo_path": "/home/elixpo_workstation/falcon",
   "branch": "main",
   "auto_push": true,
+  "committer": {
+    "name": "lixiorg",
+    "email": "lixiorg@users.noreply.github.com"
+  },
   "co_authors": [
-    { "name": "ez-vivek", "email": "vivektalent200@gmail.com" },
-    { "name": "CSE-Anwesha", "email": "misschakraborty2004@gmail.com" }
+    { "name": "Circuit-Overtime", "email": "ayushbhatt633@gmail.com", "weight": 5 },
+    { "name": "ez-vivek", "email": "vivektalent200@gmail.com", "weight": 3 },
+    { "name": "CSE-Anwesha", "email": "misschakraborty2004@gmail.com", "weight": 2 }
   ]
 }

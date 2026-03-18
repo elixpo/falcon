@@ -4,8 +4,8 @@ services:
     container_name: falcon-engine
     restart: unless-stopped
     environment:
-      - GIT_USER_NAME=Circuit-Overtime
-      - GIT_USER_EMAIL=ayushbhatt633@gmail.com
+      - GIT_USER_NAME=lixiorg
+      - GIT_USER_EMAIL=lixiorg@users.noreply.github.com
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - MODE=loop
     volumes:

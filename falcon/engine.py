@@ -11,6 +11,7 @@ def run_session():
     config = load_config()
     target = config["target_commits"]
     co_authors = config["co_authors"]
+    committer = config.get("committer")
     min_c = config["min_commits_per_day"]
     max_c = config["max_commits_per_day"]
     state = load_state()
@@ -47,7 +48,7 @@ def run_session():
     completed = 0
     for i in range(num_commits):
         try:
-            make_commit(current + i, target, i, co_authors)
+            make_commit(current + i, target, i, co_authors, committer)
             completed += 1
 
             if (i + 1) % 100 == 0:

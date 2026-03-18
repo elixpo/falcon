@@ -155,7 +155,7 @@ def generate_readme(count, target, co_authors):
   W1      W2      W3      W4
 ```
 
-<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Circuit-Overtime&theme=github_dark" width="95%"/>
+<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=lixiorg&theme=github_dark" width="95%"/>
 
 </div>
 
