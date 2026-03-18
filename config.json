@@ -5,5 +5,8 @@
   "repo_path": "/home/elixpo_workstation/falcon",
   "branch": "main",
   "auto_push": true,
-  "co_authors": []
+  "co_authors": [
+    { "name": "ez-vivek", "email": "vivektalent200@gmail.com" },
+    { "name": "CSE-Anwesha", "email": "misschakraborty2004@gmail.com" }
+  ]
 }

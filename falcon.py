@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""
-Falcon — Automated commit engine with ASCII art progress tracking.
-All commits are made from the repo owner's git config.
-Co-authors are added as commit trailers for natural appearance.
-"""
+
 
 import json
 import os
@@ -16,7 +12,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.json")
 PROGRESS_FILE = os.path.join(SCRIPT_DIR, "progress.txt")
 
-# ASCII digit font (5 lines tall)
 DIGITS = {
     "0": [
         " ██████╗ ",
