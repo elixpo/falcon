@@ -101,7 +101,10 @@ def simulate(total_commits=None, sessions=None):
     bg_avg = sum(day_counts[d] for d in bg_days) / len(bg_days) if bg_days else 0
 
     print(f"  Quartiles:  Q1={q[0]:,}  Q2={q[1]:,}  Q3={q[2]:,}")
-    print(f"  Bright avg: {bright_avg:,.0f}/day   Background avg: {bg_avg:,.0f}/day   Ratio: {bright_avg / bg_avg:.1f}x")
+    if bg_avg > 0:
+        print(f"  Bright avg: {bright_avg:,.0f}/day   Background avg: {bg_avg:,.0f}/day   Ratio: {bright_avg / bg_avg:.1f}x")
+    else:
+        print(f"  Bright avg: {bright_avg:,.0f}/day   Background: 0 (gray squares)")
     print(f"  Total:      {sum(day_counts.values()):,}")
     print()
 

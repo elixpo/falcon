@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from .ascii_art import render_small_number
+from .git import get_current_count
 
 
 def generate_readme(count, target):
@@ -16,7 +17,11 @@ def generate_readme(count, target):
 [![Commits](https://img.shields.io/github/commit-activity/w/elixpo/falcon?style=for-the-badge&color=00d4ff&label=Weekly%20Commits)](https://github.com/elixpo/falcon/commits/main)
 [![Last Commit](https://img.shields.io/github/last-commit/elixpo/falcon?style=for-the-badge&color=7c3aed)](https://github.com/elixpo/falcon)
 
-<br><br>
+<br>
+
+<img src="https://github-readme-activity-graph.vercel.app/graph?username=elixpo&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
+
+<br>
 
 ```
 {ascii_count}
