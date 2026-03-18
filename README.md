@@ -6,6 +6,7 @@
 
 [![Commits](https://img.shields.io/github/commit-activity/w/elixpo/falcon?style=for-the-badge&color=00d4ff&label=Weekly%20Commits)](https://github.com/elixpo/falcon/commits/main)
 [![Last Commit](https://img.shields.io/github/last-commit/elixpo/falcon?style=for-the-badge&color=7c3aed)](https://github.com/elixpo/falcon)
+[![Target](https://img.shields.io/badge/Target-2M_Commits-22c55e?style=for-the-badge)](https://github.com/elixpo/falcon)
 
 <br>
 
@@ -13,15 +14,29 @@
 
 <br>
 
-## We are Right Now at This Number of Commits!
+<table>
+<tr><td>
 
 ```
-┌─┐ ┌─┐ ┌─┐     ┌─┐ ┌─┐ ┌─┐ 
-┌─┘ │ │ │ │     │ │ ┌─┘ ├─┤ 
-└── └─┘ └─┘  ,  └─┘ └── └─┘ 
+┌─┐ ┌─┐ ┌─┐     ┌─┐ ──┐ ┌─┐ 
+┌─┘ │ │ │ │     │ │  ─┤ ┌─┘ 
+└── └─┘ └─┘  ,  └─┘ ──┘ └── 
 ```
 
-**200,028** / **2,000,000** &mdash; 10.00%
+</td></tr>
+</table>
+
+### `██░░░░░░░░░░░░░░░░░░` &nbsp; **10.00%**
+
+<br>
+
+| | | |
+|:---:|:---:|:---:|
+| **200,032** | of | **2,000,000** |
+| Remaining | | **1,799,968** |
+| ETA | | **~9 days** |
+| Status | | ✈️ 100K |
+| Updated | | `2026-03-18 16:16 UTC` |
 
 <br>
 
