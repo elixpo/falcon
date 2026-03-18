@@ -1,6 +1,7 @@
 venv/
+.git/
 __pycache__/
 *.pyc
 falcon.log
 state.json
-.env
+.github/

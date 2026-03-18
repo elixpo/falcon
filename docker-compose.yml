@@ -1,0 +1,19 @@
+services:
+  falcon:
+    build: .
+    container_name: falcon-engine
+    restart: unless-stopped
+    environment:
+      - GIT_USER_NAME=Circuit-Overtime
+      - GIT_USER_EMAIL=ayushbhatt633@gmail.com
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - MODE=loop
+      - INTERVAL_HOURS=24
+      - JITTER_HOURS=6
+    volumes:
+      - .:/repo
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
