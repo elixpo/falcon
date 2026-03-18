@@ -14,28 +14,125 @@ from .git import (
 from .renderer import generate_readme
 
 
-def generate_2026_timestamps(count):
-    """Generate timestamps across 2026, weighted toward end of year.
+# 5×7 pixel font for contribution graph (row=day_of_week, col=week)
+GRAPH_DIGITS = {
+    "2": [
+        [0, 1, 1, 1, 0],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [0, 1, 1, 1, 0],
+    ],
+    "0": [
+        [0, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
+    ],
+    "6": [
+        [0, 1, 1, 1, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
+    ],
+}
 
-    Uses power distribution (r^0.5) so the contribution graph shows
-    activity all year with heavier highlights toward Dec 2026.
+
+def build_2026_pattern():
+    """Build set of dates that spell '2026' on GitHub's contribution graph.
+
+    GitHub graph: 7 rows (Sun=0..Sat=6), ~53 columns (weeks).
+    Jan 1, 2026 = Thursday. Base Sunday = Dec 28, 2025.
     """
-    start = datetime(2026, 1, 1)
-    total_seconds = 364 * 86400  # seconds in 2026
+    base = datetime(2025, 12, 28)  # Sunday before Jan 1, 2026
 
+    # "2","0","2","6" — each 5 cols wide, 1 col gap, total 23 cols
+    # Centered in ~53 cols: start at col 15
+    text = "2026"
+    digit_positions = []
+    col = 15
+    for ch in text:
+        digit_positions.append((ch, col))
+        col += 6  # 5 wide + 1 gap
+
+    bright_dates = set()
+    for ch, start_col in digit_positions:
+        pattern = GRAPH_DIGITS[ch]
+        for row in range(7):
+            for dcol in range(5):
+                if pattern[row][dcol]:
+                    week_col = start_col + dcol
+                    date = base + timedelta(days=week_col * 7 + row)
+                    if date.year == 2026:
+                        bright_dates.add(date.date())
+
+    return bright_dates
+
+
+def generate_2026_timestamps(count):
+    """Generate timestamps that paint '2026' on the contribution graph.
+
+    Bright dates (forming '2026') get 8x more commits than background.
+    All days get some commits so every square is filled.
+    """
+    bright = build_2026_pattern()
+
+    start = datetime(2026, 1, 1).date()
+    all_days = [start + timedelta(days=i) for i in range(365)]
+
+    # Weight: bright=8, background=1
+    BRIGHT_WEIGHT = 8
+    BG_WEIGHT = 1
+    weights = []
+    for day in all_days:
+        weights.append(BRIGHT_WEIGHT if day in bright else BG_WEIGHT)
+
+    total_weight = sum(weights)
+
+    # Distribute commits proportionally
+    day_commits = {}
+    assigned = 0
+    for day, w in zip(all_days, weights):
+        n = max(1, int(count * w / total_weight))
+        day_commits[day] = n
+        assigned += n
+
+    # Fix remainder — distribute across all days until exact
+    diff = count - assigned
+    while diff > 0:
+        pool = list(bright) if diff > len(all_days) else all_days
+        batch = min(diff, len(pool))
+        for day in random.sample(pool, batch):
+            day_commits[day] += 1
+        diff -= batch
+    while diff < 0:
+        bg_days = [d for d in all_days if d not in bright and day_commits[d] > 1]
+        if not bg_days:
+            break
+        batch = min(-diff, len(bg_days))
+        for day in random.sample(bg_days, batch):
+            day_commits[day] -= 1
+        diff += batch
+
+    # Generate actual timestamps
     timestamps = []
-    for _ in range(count):
-        # r^0.5 biases toward higher values → more commits late in 2026
-        r = random.random() ** 0.5
-        offset = int(r * total_seconds)
-        ts = start + timedelta(seconds=offset)
-        # Randomize time of day for natural look
-        ts = ts.replace(
-            hour=random.randint(8, 23),
-            minute=random.randint(0, 59),
-            second=random.randint(0, 59),
-        )
-        timestamps.append(ts)
+    for day, n in day_commits.items():
+        for _ in range(n):
+            ts = datetime.combine(day, datetime.min.time())
+            ts = ts.replace(
+                hour=random.randint(8, 23),
+                minute=random.randint(0, 59),
+                second=random.randint(0, 59),
+            )
+            timestamps.append(ts)
 
     timestamps.sort()
     return timestamps
@@ -78,11 +175,13 @@ def run_session():
     }
     save_state(state)
 
+    bright_count = len(build_2026_pattern())
     print(f"[falcon] Session: {num_commits:,} commits")
     print(f"[falcon] Current: {current:,} / Target: {target:,}")
+    print(f"[falcon] Pattern: '2026' on contribution graph ({bright_count} bright days)")
     print(f"[falcon] Using git plumbing for maximum speed")
 
-    # Generate 2026 timestamps for contribution graph
+    # Generate timestamps that paint "2026" on the contribution graph
     timestamps = generate_2026_timestamps(num_commits)
 
     # Prepare committer environment
@@ -116,7 +215,6 @@ def run_session():
 
         # Update files and tree periodically
         if i > 0 and i % readme_interval == 0:
-            # Must update-ref first so stage_files works against current HEAD
             update_ref(branch, parent)
             readme = generate_readme(count, target)
             with open(README_FILE, "w") as f:
