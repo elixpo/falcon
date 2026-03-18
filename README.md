@@ -14,7 +14,7 @@
 
 <br>
 
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=elixpo&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
+<img src="https://github-readme-activity-graph.vercel.app/graph?username=Circuit-Overtime&repo=falcon&theme=react-dark&hide_border=true&area=true&custom_title=Falcon%20Commit%20Activity" width="95%"/>
 
 </div>
 
@@ -121,75 +121,6 @@ Each session produces **900-1,000 commits**, with every single one updating the 
 </tr>
 </table>
 
----
-
-<details>
-<summary><b>:building_construction: Architecture</b></summary>
-
-<br>
-
-```
-falcon/
-├── falcon/                  # Core Python package
-│   ├── __main__.py          # Entry point (python -m falcon)
-│   ├── ascii_art.py         # ASCII digit font + renderer
-│   ├── config.py            # Config & state management
-│   ├── engine.py            # Session orchestrator
-│   ├── git.py               # Git operations (commit, push)
-│   └── renderer.py          # Progress bar + content generation
-├── scripts/
-│   ├── setup_cron.py        # Cron scheduler
-│   └── setup_systemd.sh     # Systemd installer
-├── systemd/                 # Systemd unit files
-├── .github/workflows/       # CI pipeline
-├── config.json              # Runtime configuration
-└── progress.txt             # Live ASCII art tracker
-```
-
-</details>
-
-<details>
-<summary><b>:zap: Quick Start</b></summary>
-
-<br>
-
-```bash
-git clone https://github.com/elixpo/falcon.git
-cd falcon
-python3 -m falcon
-```
-
-**Systemd (recommended for always-on):**
-```bash
-sudo ./scripts/setup_systemd.sh
-```
-
-**Cron:**
-```bash
-python3 scripts/setup_cron.py --dry-run
-python3 scripts/setup_cron.py
-```
-
-</details>
-
----
-
-<div align="center">
-
-## :busts_in_silhouette: Contributors
-
-<a href="https://github.com/elixpo/falcon/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=elixpo/falcon&columns=6" />
-</a>
-
-<br><br>
-
-<a href="https://github.com/ez-vivek"><img src="https://github.com/ez-vivek.png" width="50" style="border-radius:50%"></a>
-<a href="https://github.com/CSE-Anwesha"><img src="https://github.com/CSE-Anwesha.png" width="50" style="border-radius:50%"></a>
-
-<a href="https://github.com/Circuit-Overtime"><img src="https://github.com/Circuit-Overtime.png" width="50" style="border-radius:50%"></a>
-
-</div>
 
 ---
 
