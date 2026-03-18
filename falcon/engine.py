@@ -98,10 +98,12 @@ def generate_2026_timestamps(count):
     total_weight = sum(weights)
 
     # Distribute commits proportionally
+    # Only enforce min 1/day (fill all squares) when count >= 365
+    min_per_day = 1 if count >= 365 else 0
     day_commits = {}
     assigned = 0
     for day, w in zip(all_days, weights):
-        n = max(1, int(count * w / total_weight))
+        n = max(min_per_day, int(count * w / total_weight))
         day_commits[day] = n
         assigned += n
 
@@ -142,7 +144,7 @@ def run_session():
     config = load_config()
     target = config["target_commits"]
     committer = config["committer"]
-    commits_per_session = config.get("commits_per_session", 200000)
+    daily_target = config.get("daily_target", 200000)
     push_interval = config.get("push_interval", 5000)
     readme_interval = config.get("readme_update_interval", 5000)
     branch = config.get("branch", "main")
@@ -156,11 +158,16 @@ def run_session():
         print(f"[falcon] Target reached! {current:,}/{target:,}")
         return
 
-    remaining = target - current
-    num_commits = min(commits_per_session, remaining)
-
     state = load_state()
     today = datetime.now().strftime("%Y-%m-%d")
+
+    # Check if today's daily target was already hit
+    if state.get("last_session_date") == today and not state.get("pending_session"):
+        print(f"[falcon] Daily target already hit for {today}. Skipping.")
+        return
+
+    remaining = target - current
+    num_commits = min(daily_target, remaining)
 
     # Resume interrupted session
     pending = state.get("pending_session")

@@ -5,14 +5,22 @@ echo "╔═══════════════════════�
 echo "║     FALCON CONTAINER STARTING            ║"
 echo "╚══════════════════════════════════════════╝"
 
-# Configure git identity
-git config --global user.name "${GIT_USER_NAME:-Circuit-Overtime}"
-git config --global user.email "${GIT_USER_EMAIL:-ayushbhatt633@gmail.com}"
+# Configure git identity as elixpoo
+git config --global user.name "${GIT_USER_NAME:-elixpoo}"
+git config --global user.email "${GIT_USER_EMAIL:-elixpoo@gmail.com}"
 git config --global credential.helper store
+
+# Git performance optimizations
+git config --global gc.auto 0
+git config --global core.preloadIndex true
+git config --global core.fscache true
+git config --global pack.threads 0
+git config --global commit.gpgsign false
+git config --global core.hooksPath /dev/null
 
 # Setup git credentials for push
 if [ -n "$GITHUB_TOKEN" ]; then
-    echo "https://${GIT_USER_NAME:-Circuit-Overtime}:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+    echo "https://${GIT_USER_NAME:-elixpoo}:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
     echo "[falcon] Git credentials configured"
 fi
 
@@ -22,7 +30,7 @@ if [ -d "/repo/.git" ]; then
     cd /repo
 else
     echo "[falcon] Cloning repo..."
-    git clone "https://${GIT_USER_NAME:-Circuit-Overtime}:${GITHUB_TOKEN}@github.com/elixpo/falcon.git" /repo
+    git clone "https://${GIT_USER_NAME:-elixpoo}:${GITHUB_TOKEN}@github.com/elixpo/falcon.git" /repo
     cp -r /app/falcon /repo/falcon
     cp /app/config.json /repo/config.json
     cd /repo
@@ -37,28 +45,24 @@ case "${MODE:-loop}" in
         python3 -m falcon
         ;;
     loop)
-        echo "[falcon] Starting loop mode — one session per day at a random time"
+        echo "[falcon] Starting daily loop — runs session, checks daily target"
         while true; do
-            # Check if target reached
+            # Check if overall target reached
             COUNT=$(git rev-list --count HEAD)
             TARGET=$(python3 -c "import json; print(json.load(open('config.json'))['target_commits'])")
             if [ "$COUNT" -ge "$TARGET" ]; then
-                echo "[falcon] Target reached! $COUNT/$TARGET. Stopping."
+                echo "[falcon] Overall target reached! $COUNT/$TARGET. Stopping."
                 break
             fi
 
             echo "[falcon] Starting session at $(date)"
+            # run_session() handles daily target check internally
+            # If today's target is already hit, it exits immediately
             python3 -m falcon || echo "[falcon] Session failed, will retry next cycle"
 
-            # Sleep 18-24h so we guarantee one session every calendar day
-            # 18h base + 0-6h jitter = 18-24h between sessions
-            BASE=$((18 * 3600))
-            JITTER=$((RANDOM % (6 * 3600)))
-            SLEEP=$((BASE + JITTER))
-            HOURS=$((SLEEP / 3600))
-            MINS=$(( (SLEEP % 3600) / 60 ))
-            echo "[falcon] Next session in ${HOURS}h ${MINS}m ($(date -d "+${SLEEP} seconds" 2>/dev/null || echo 'check logs'))"
-            sleep $SLEEP
+            # Sleep until next check — every 6h to catch the next day
+            echo "[falcon] Next check in 6h ($(date -d '+6 hours' 2>/dev/null || echo 'check logs'))"
+            sleep 21600
         done
         ;;
     *)
