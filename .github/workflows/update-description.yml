@@ -23,7 +23,7 @@ jobs:
         run: |
           COUNT=$(git rev-list --count HEAD)
           FORMATTED=$(printf "%'d" $COUNT)
-          DESC="An automated counting CI repository for automated GitHub commits! -- Right Now at ${FORMATTED} commits"
+          DESC="An automated counting CI repository for automated GitHub commits! -- Falcon Flies high at ${FORMATTED} commits"
 
           echo "Updating description: $DESC"
 
