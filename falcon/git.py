@@ -76,10 +76,23 @@ def update_ref(branch, commit_hash):
     )
 
 
+def pull_and_merge(branch="main"):
+    """Pull remote changes and merge with ort strategy."""
+    subprocess.run(
+        ["git", "fetch", "origin", branch],
+        cwd=ROOT_DIR, capture_output=True, check=True, timeout=120
+    )
+    subprocess.run(
+        ["git", "merge", f"origin/{branch}", "--strategy=ort", "--no-edit"],
+        cwd=ROOT_DIR, capture_output=True, check=True, timeout=120
+    )
+
+
 def push(branch="main", retries=3):
-    """Push to remote with retries. Timeout 10 min per attempt."""
+    """Pull remote changes (ort merge), then push with retries."""
     for attempt in range(1, retries + 1):
         try:
+            pull_and_merge(branch)
             subprocess.run(
                 ["git", "push", "origin", branch],
                 cwd=ROOT_DIR, capture_output=True, check=True, timeout=600
