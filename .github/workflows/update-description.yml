@@ -25,7 +25,8 @@ jobs:
           FORMATTED=$(printf "%'d" $COUNT)
           DESC="An automated counting CI repository for automated GitHub commits! -- Falcon Flies high at ${FORMATTED} commits"
 
-          echo "Updating description: $DESC"
+          echo "Updating description: $DESC"docker compose down && docker compose up -d --build
+
 
           gh api repos/elixpo/falcon \
             --method PATCH \

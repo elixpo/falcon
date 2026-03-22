@@ -95,7 +95,7 @@ def push(branch="main", retries=3):
             pull_and_merge(branch)
             subprocess.run(
                 ["git", "push", "origin", branch],
-                cwd=ROOT_DIR, capture_output=True, check=True, timeout=600
+                cwd=ROOT_DIR, capture_output=True, check=True, timeout=1800
             )
             return
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:

@@ -1,6 +1,6 @@
 {
   "target_commits": 2000000,
-  "daily_target": 200000,
+  "daily_target": 300000,
   "repo_path": "/home/elixpo_workstation/falcon",
   "branch": "main",
   "auto_push": true,
