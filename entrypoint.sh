@@ -46,7 +46,7 @@ case "${MODE:-loop}" in
         python3 -m falcon
         ;;
     loop)
-        echo "[falcon] Starting loop — 2 sessions/day, 300k each"
+        echo "[falcon] Starting loop — 3 sessions/day, 500k each"
         while true; do
             # Check if overall target reached
             COUNT=$(git rev-list --count HEAD)
@@ -56,16 +56,11 @@ case "${MODE:-loop}" in
                 break
             fi
 
-            # Run session 1
-            echo "[falcon] Session 1 starting at $(date)"
-            python3 -m falcon || echo "[falcon] Session 1 failed, will retry"
+            for SESSION in 1 2 3; do
+                echo "[falcon] Session $SESSION/3 starting at $(date)"
 
-            # Wait 10 hours then run session 2
-            echo "[falcon] Session 2 in 10h ($(date -d '+10 hours' 2>/dev/null || echo 'check logs'))"
-            sleep 36000
-
-            # Reset daily state so session 2 can run on the same day
-            python3 -c "
+                # Reset state so each session can run
+                python3 -c "
 import json
 try:
     with open('state.json','r') as f: s = json.load(f)
@@ -74,14 +69,18 @@ try:
     with open('state.json','w') as f: json.dump(s, f, indent=2)
 except: pass
 "
+                python3 -m falcon || echo "[falcon] Session $SESSION failed, will retry"
 
-            # Run session 2
-            echo "[falcon] Session 2 starting at $(date)"
-            python3 -m falcon || echo "[falcon] Session 2 failed, will retry"
+                # 7h gap between sessions (3 × 7h ≈ 21h cycle, fits in a day)
+                if [ "$SESSION" -lt 3 ]; then
+                    echo "[falcon] Next session in 7h ($(date -d '+7 hours' 2>/dev/null || echo 'check logs'))"
+                    sleep 25200
+                fi
+            done
 
-            # Wait until next day
-            echo "[falcon] Next cycle in 10h ($(date -d '+10 hours' 2>/dev/null || echo 'check logs'))"
-            sleep 36000
+            # Sleep remaining ~3h until next day cycle
+            echo "[falcon] Next cycle in 3h ($(date -d '+3 hours' 2>/dev/null || echo 'check logs'))"
+            sleep 10800
         done
         ;;
     *)

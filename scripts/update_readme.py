@@ -19,8 +19,8 @@ SMALL_DIGITS = {
     ",": ["   ", "   ", " , "],
 }
 
-TARGET = 2000000
-DAILY_RATE = 200000
+TARGET = 20000000
+DAILY_RATE = 1500000
 
 
 def render_small_number(n):
@@ -80,7 +80,7 @@ def generate_readme(count):
 
 [![Commits](https://img.shields.io/github/commit-activity/w/elixpo/falcon?style=for-the-badge&color=00d4ff&label=Weekly%20Commits)](https://github.com/elixpo/falcon/commits/main)
 [![Last Commit](https://img.shields.io/github/last-commit/elixpo/falcon?style=for-the-badge&color=7c3aed)](https://github.com/elixpo/falcon)
-[![Target](https://img.shields.io/badge/Target-2M_Commits-22c55e?style=for-the-badge)](https://github.com/elixpo/falcon)
+[![Target](https://img.shields.io/badge/Target-20M_Commits-22c55e?style=for-the-badge)](https://github.com/elixpo/falcon)
 
 <br>
 
