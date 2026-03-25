@@ -6,7 +6,7 @@
 
 [![Commits](https://img.shields.io/github/commit-activity/w/elixpo/falcon?style=for-the-badge&color=00d4ff&label=Weekly%20Commits)](https://github.com/elixpo/falcon/commits/main)
 [![Last Commit](https://img.shields.io/github/last-commit/elixpo/falcon?style=for-the-badge&color=7c3aed)](https://github.com/elixpo/falcon)
-[![Target](https://img.shields.io/badge/Target-2M_Commits-22c55e?style=for-the-badge)](https://github.com/elixpo/falcon)
+[![Target](https://img.shields.io/badge/Target-20M_Commits-22c55e?style=for-the-badge)](https://github.com/elixpo/falcon)
 
 <br>
 
@@ -18,25 +18,39 @@
 <tr><td>
 
 ```
+<<<<<<< HEAD
 ┌─┐     ┌─┐ ┌─┐ ┌─┐     ┌─┐ ┌─┐ ┌─┐ 
 ┌─┘     │ │ │ │ │ │     │ │ │ │ └─┤ 
 └──  ,  └─┘ └─┘ └─┘  ,  └─┘ └─┘ ──┘ 
+=======
+┌─┐     ┌─┐ ┌─┐ ┌─┐     ┌─┐  ┐  ┌── 
+┌─┘     │ │ │ │ │ │     │ │  │  ├─┐ 
+└──  ,  └─┘ └─┘ └─┘  ,  └─┘  ┘  └─┘ 
+>>>>>>> origin/main
 ```
 
 </td></tr>
 </table>
 
-### `████████████████████` &nbsp; **100.00%**
+### `██░░░░░░░░░░░░░░░░░░` &nbsp; **10.00%**
 
 <br>
 
 | | | |
 |:---:|:---:|:---:|
+<<<<<<< HEAD
 | **2,000,009** | of | **2,000,000** |
 | Remaining | | **0** |
 | ETA | | **~0 days** |
 | Status | | 🏔️ ONE MILLION |
 | Updated | | `2026-03-24 05:21 UTC` |
+=======
+| **2,000,016** | of | **20,000,000** |
+| Remaining | | **17,999,984** |
+| ETA | | **~12 days** |
+| Status | | 🏔️ ONE MILLION |
+| Updated | | `2026-03-24 11:12 UTC` |
+>>>>>>> origin/main
 
 <br>
 
